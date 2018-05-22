@@ -41,7 +41,6 @@ public class Expedient extends CustomEnchant implements Listener {
         Player p = event.getPlayer();
         ItemStack mainHand = p.getInventory().getItem(event.getNewSlot());
         int enchLevel = getEnchantmentLevel(mainHand);
-        System.out.println(enchLevel);
         p.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0f + (float) (enchLevel) / 2.0f);
     }
 
@@ -50,7 +49,6 @@ public class Expedient extends CustomEnchant implements Listener {
         Player p = (Player) event.getWhoClicked();
         ItemStack mainHand = p.getInventory().getItemInMainHand();
         int enchLevel = getEnchantmentLevel(mainHand);
-        System.out.println(enchLevel);
         p.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0f + (float) (enchLevel) / 2.0f);
     }
 }
