@@ -6,3 +6,11 @@ commands:
   eplus:
     description: Main Enchantments+ command
     usage: /eplus
+permissions:
+  eplus.*:
+    description: Gives access to all eplus commands
+    children:
+      eplus.admin: true
+  eplus.admin:
+    description: Allows user to open the administrator enchanting menu
+    default: op

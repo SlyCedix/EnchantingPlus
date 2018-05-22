@@ -12,7 +12,16 @@ public class CommandEplus implements CommandExecutor {
         if (command.getName().equalsIgnoreCase("eplus")) {
             if (sender instanceof Player) {
                 Player p = (Player) sender;
-                boolean success = EnchantingGui.openGUI(p);
+                boolean success = false;
+                if(args.length >= 1 && args[0].equalsIgnoreCase("admin")) {
+                    if(sender.hasPermission("eplus.admin")) {
+                        success = EnchantingGui.openGUI(p, true);
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "You do not have permission to open that menu");
+                    }
+                } else {
+                    success = EnchantingGui.openGUI(p, false);
+                }
                 if (!success) {
                     sender.sendMessage(ChatColor.DARK_RED + "Could not open enchanting gui");
                 }
