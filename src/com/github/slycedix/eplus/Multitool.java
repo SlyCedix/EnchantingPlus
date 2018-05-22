@@ -11,8 +11,28 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class Multitool extends CustomEnchant implements Listener {
-    public enum tool{PICKAXE, AXE, SHOVEL, ANY}
-    public enum mat{WOOD, STONE, GOLD, IRON, DIAMOND}
+    public enum tool{PICKAXE("_PICKAXE"), AXE("_AXE"), SPADE("_SPADE"), ANY("");
+        private String type;
+
+        tool(String type) {
+            this.type = type;
+        }
+
+        public String getType() {
+            return type;
+        }
+    }
+    public enum mat{WOOD("WOOD"), STONE("STONE"), GOLD("GOLD"), IRON("IRON"), DIAMOND("DIAMOND");
+        private String type;
+
+        mat(String type) {
+            this.type = type;
+        }
+
+        public String getType() {
+            return type;
+        }
+    }
 
     @Override
     public String getName(){
@@ -46,66 +66,8 @@ public class Multitool extends CustomEnchant implements Listener {
         if(getEnchantmentLevel(mainHand) > 0){
             tool neededTool = ToolBrokenBy(event);
             mat toolMaterial = getItemMaterial(mainHand);
-            switch(neededTool){
-                case PICKAXE:
-                    switch(toolMaterial) {
-                        case WOOD:
-                            mainHand.setType(Material.WOOD_PICKAXE);
-                            break;
-                        case STONE:
-                            mainHand.setType(Material.STONE_PICKAXE);
-                            break;
-                        case IRON:
-                            mainHand.setType(Material.IRON_PICKAXE);
-                            break;
-                        case GOLD:
-                            mainHand.setType(Material.GOLD_PICKAXE);
-                            break;
-                        case DIAMOND:
-                            mainHand.setType(Material.DIAMOND_PICKAXE);
-                            break;
-                    }
-                    break;
-                case AXE:
-                    switch(toolMaterial) {
-                        case WOOD:
-                            mainHand.setType(Material.WOOD_AXE);
-                            break;
-                        case STONE:
-                            mainHand.setType(Material.STONE_AXE);
-                            break;
-                        case IRON:
-                            mainHand.setType(Material.IRON_AXE);
-                            break;
-                        case GOLD:
-                            mainHand.setType(Material.GOLD_AXE);
-                            break;
-                        case DIAMOND:
-                            mainHand.setType(Material.DIAMOND_AXE);
-                            break;
-                    }
-                    break;
-                case SHOVEL:
-                    switch(toolMaterial) {
-                        case WOOD:
-                            mainHand.setType(Material.WOOD_SPADE);
-                            break;
-                        case STONE:
-                            mainHand.setType(Material.STONE_SPADE);
-                            break;
-                        case IRON:
-                            mainHand.setType(Material.IRON_SPADE);
-                            break;
-                        case GOLD:
-                            mainHand.setType(Material.GOLD_SPADE);
-                            break;
-                        case DIAMOND:
-                            mainHand.setType(Material.DIAMOND_SPADE);
-                            break;
-                    }
-                    break;
-                default:
-                    break;
+            if(!neededTool.equals(tool.ANY)){
+                mainHand.setType(Material.valueOf(toolMaterial.getType() + neededTool.getType()));
             }
         }
     }
@@ -117,23 +79,7 @@ public class Multitool extends CustomEnchant implements Listener {
             ItemStack mainHand = p.getInventory().getItemInMainHand();
             if(getEnchantmentLevel(mainHand) > 0){
                 mat toolMaterial = getItemMaterial(mainHand);
-                switch(toolMaterial) {
-                    case WOOD:
-                        mainHand.setType(Material.WOOD_SWORD);
-                        break;
-                    case STONE:
-                        mainHand.setType(Material.STONE_SWORD);
-                        break;
-                    case IRON:
-                        mainHand.setType(Material.IRON_SWORD);
-                        break;
-                    case GOLD:
-                        mainHand.setType(Material.GOLD_SWORD);
-                        break;
-                    case DIAMOND:
-                        mainHand.setType(Material.DIAMOND_SWORD);
-                        break;
-                }
+                mainHand.setType(Material.valueOf(toolMaterial.getType() + "_SWORD"));
             }
         }
     }
@@ -145,7 +91,7 @@ public class Multitool extends CustomEnchant implements Listener {
         if(net.minecraft.server.v1_12_R1.Item.getById(279).getDestroySpeed(CraftItemStack.asNMSCopy(event.getItemInHand()),nmsBlock.getBlockData()) > 1.0f)
             return tool.AXE;
         if(net.minecraft.server.v1_12_R1.Item.getById(277).getDestroySpeed(CraftItemStack.asNMSCopy(event.getItemInHand()),nmsBlock.getBlockData()) > 1.0f)
-            return tool.SHOVEL;
+            return tool.SPADE;
         return tool.ANY;
     }
 
