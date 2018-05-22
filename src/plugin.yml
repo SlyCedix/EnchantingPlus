@@ -1,0 +1,8 @@
+name: Eplus
+version: 1.0
+author: SlyCedix
+main: com.github.slycedix.eplus.Main
+commands:
+  eplus:
+    description: Main Enchantments+ command
+    usage: /eplus

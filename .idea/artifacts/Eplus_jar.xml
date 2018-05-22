@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Eplus:jar">
+    <output-path>E:/SlyBlock/Server/plugins</output-path>
+    <root id="archive" name="Eplus.jar">
+      <element id="module-output" name="Eplus" />
+      <element id="extracted-dir" path="E:/SlyBlock/Spigot/Spigot-API/target/spigot-api-1.12.2-R0.1-SNAPSHOT-shaded.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="E:/SlyBlock/spigot-1.12.2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
