@@ -16,17 +16,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 
 public class EnchantingGui implements Listener {
-    private static Inventory enchantingGUI = Bukkit.createInventory(null, 36, ChatColor.DARK_GREEN + "Enchanting");
     private static Multitool multitool = new Multitool();
     private static Expedient expedient = new Expedient();
 
-    private static ItemStack[] enchantedBooks = {new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK),
-            new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK)};
-
-    private static ItemMeta[] enchantedBooksMeta = {enchantedBooks[0].getItemMeta(), enchantedBooks[0].getItemMeta(),
-            enchantedBooks[0].getItemMeta(),enchantedBooks[0].getItemMeta(), enchantedBooks[0].getItemMeta()};
-
-    static boolean openGUI(Player p){
+    public static boolean openGUI(Player p){
+        Inventory enchantingGUI = Bukkit.createInventory(null, 36, ChatColor.DARK_GREEN + "Enchanting");
         ItemStack prev = new ItemStack(Material.PAPER);
         ItemStack next = new ItemStack(Material.PAPER);
         ItemStack filler = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
@@ -63,49 +57,13 @@ public class EnchantingGui implements Listener {
 
         multiPick.setItemMeta(multiPickMeta);
         expedSugar.setItemMeta(expedSugarMeta);
-
-        enchantingGUI.setItem(0, filler);
-        enchantingGUI.setItem(1, filler);
-        enchantingGUI.setItem(2, filler);
-        enchantingGUI.setItem(3, filler);
-        enchantingGUI.setItem(4, filler);
-        enchantingGUI.setItem(5, filler);
-        enchantingGUI.setItem(6, filler);
-        enchantingGUI.setItem(7, filler);
-        enchantingGUI.setItem(8, filler);
-
-        enchantingGUI.setItem(9, filler);
-        enchantingGUI.setItem(10, filler);
-        enchantingGUI.setItem(11, filler);
+        for(int i  = 0; i < 36; i++){
+            enchantingGUI.setItem(i, filler);
+        }
         enchantingGUI.setItem(12, expedSugar);
         enchantingGUI.setItem(13, multiPick);
-        enchantingGUI.setItem(14, filler);
-        enchantingGUI.setItem(15, filler);
-        enchantingGUI.setItem(16, filler);
-        enchantingGUI.setItem(17, filler);
-
-        enchantingGUI.setItem(18, filler);
-        enchantingGUI.setItem(19, filler);
-        enchantingGUI.setItem(20, filler);
-        enchantingGUI.setItem(21, filler);
-        enchantingGUI.setItem(22, filler);
-        enchantingGUI.setItem(23, filler);
-        enchantingGUI.setItem(24, filler);
-        enchantingGUI.setItem(25, filler);
-        enchantingGUI.setItem(26, filler);
-
-        enchantingGUI.setItem(27, prev);
-        enchantingGUI.setItem(28, filler);
-        enchantingGUI.setItem(29, filler);
-        enchantingGUI.setItem(30, filler);
-        enchantingGUI.setItem(31, filler);
-        enchantingGUI.setItem(32, filler);
-        enchantingGUI.setItem(33, filler);
-        enchantingGUI.setItem(34, filler);
-        enchantingGUI.setItem(35, next);
 
         p.openInventory(enchantingGUI);
-
         return true;
     }
 
@@ -114,29 +72,61 @@ public class EnchantingGui implements Listener {
         Player p = (Player) event.getWhoClicked();
         Inventory inventory = event.getInventory();
 
-        if(inventory.equals(enchantingGUI) && event.getSlotType() != InventoryType.SlotType.OUTSIDE){
+        if(inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting") && event.getSlotType() != InventoryType.SlotType.OUTSIDE){
             ItemStack clicked = event.getCurrentItem();
             String clickedName = clicked.getItemMeta().getDisplayName();
             ItemStack mainHand = p.getInventory().getItemInMainHand();
+            String nameColor = ChatColor.DARK_AQUA + "" + ChatColor.BOLD;
+            String[] enchNames = {nameColor + "Multitool", nameColor + "Expedient"};
+            Boolean success = false;
+            Boolean attemptedEnchant = false;
 
-            if(clickedName.equals(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Multitool")){
-                if(multitool.enchantItem(mainHand, (byte)1)){
-                    p.sendMessage(ChatColor.GREEN + "Enchantment Successful");
-                } else {
-                    p.sendMessage(ChatColor.RED + "Enchantment Unsuccessful");
-                }
-            } else if(clickedName.equals(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Expedient")){
-                enchantedBooksMeta[0].setDisplayName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Expedient I");
-                enchantedBooksMeta[1].setDisplayName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Expedient II");
-                enchantedBooksMeta[2].setDisplayName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Expedient III");
+            ItemStack[] enchantedBooks = {new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK),
+                    new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK)};
+
+            ItemMeta[] enchantedBooksMeta = {enchantedBooks[0].getItemMeta(), enchantedBooks[0].getItemMeta(),
+                    enchantedBooks[0].getItemMeta(),enchantedBooks[0].getItemMeta(), enchantedBooks[0].getItemMeta()};
+
+            ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
+            ItemMeta goBackMeta = goBack.getItemMeta();
+            goBackMeta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+            goBack.setItemMeta(goBackMeta);
+
+            if(clickedName.equals(enchNames[0])){
+                success = multitool.enchantItem(mainHand, (byte)1);
+                attemptedEnchant = true;
+            }else if(clickedName.equals(enchNames[1])){
+                enchantedBooksMeta[0].setDisplayName(enchNames[1] + " I");
+                enchantedBooksMeta[1].setDisplayName(enchNames[1] + " II");
+                enchantedBooksMeta[2].setDisplayName(enchNames[1] + " III");
 
                 enchantedBooks[0].setItemMeta(enchantedBooksMeta[0]);
                 enchantedBooks[1].setItemMeta(enchantedBooksMeta[1]);
                 enchantedBooks[2].setItemMeta(enchantedBooksMeta[2]);
 
-                enchantingGUI.setItem(12, enchantedBooks[0]);
-                enchantingGUI.setItem(13, enchantedBooks[1]);
-                enchantingGUI.setItem(14, enchantedBooks[2]);
+                inventory.setItem(12, enchantedBooks[0]);
+                inventory.setItem(13, enchantedBooks[1]);
+                inventory.setItem(14, enchantedBooks[2]);
+                inventory.setItem(31, goBack);
+            }else if(clickedName.contains(enchNames[1] + " ")){
+                if(clickedName.equals(enchNames[1] + " I")){
+                    success = expedient.enchantItem(mainHand, (byte) 1);
+                } else if(clickedName.equals(enchNames[1] + " II")){
+                    success = expedient.enchantItem(mainHand, (byte) 2);
+                } else if(clickedName.equals(enchNames[1] + " III")){
+                    success = expedient.enchantItem(mainHand, (byte) 3);
+                }
+                attemptedEnchant = true;
+            } else if(clickedName.equals(goBack.getItemMeta().getDisplayName())){
+                p.closeInventory();
+                openGUI(p);
+            }
+            if(attemptedEnchant) {
+                if (success) {
+                    p.sendMessage(ChatColor.GREEN + "Enchantment Successful");
+                }else{
+                    p.sendMessage(ChatColor.RED + "Enchantment Unsuccessful");
+                }
             }
             event.setCancelled(true);
         }
