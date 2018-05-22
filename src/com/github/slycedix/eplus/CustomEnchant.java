@@ -65,7 +65,6 @@ public abstract class CustomEnchant{
                     if (str.contains(this.getName())) {
                         String levelStr = str.substring(this.getName().length() + 1);
                         currLevel = (byte) (Arrays.asList(romanNumerals).indexOf(levelStr) + 1);
-                        System.out.println(levelStr);
                         break;
                     }
                 }
