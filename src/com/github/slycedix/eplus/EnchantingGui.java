@@ -1,9 +1,11 @@
 package com.github.slycedix.eplus;
 
 
+import net.minecraft.server.v1_12_R1.ItemAxe;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -83,6 +85,8 @@ public class EnchantingGui implements Listener {
             if (clickedName.contains("Go Back")) {
                 p.closeInventory();
                 openGUI(p, inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting Admin"));
+            } else if(clickedName.contains("Vanilla")) {
+
             } else {
                 getEnchantFromName(clickedName, p, inventory);
             }
@@ -227,5 +231,89 @@ public class EnchantingGui implements Listener {
             inventory.setItem(13 - (enchants.length / 2) + i,item);
             i++;
         }
+    }
+
+    private static void populateVanillaEnchants(Inventory inventory, Player p){
+        fillInventory(inventory);
+        ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
+        setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+        addLoreToItem(goBack, ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
+        inventory.setItem(31, goBack);
+
+        Enchantment[] possibleEnchants = getVanillaEnchants(p.getInventory().getItemInMainHand());
+
+        ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
+
+        int i = 0;
+
+        if(possibleEnchants.length <= 7){
+            for(Enchantment ench : possibleEnchants){
+                setItemName(book, nameColor + ench.getName());
+                inventory.setItem(13 - (enchants.length / 2) + i,book);
+                i++;
+            }
+        }  else if(possibleEnchants.length > 7){
+            for(Enchantment ench : possibleEnchants){
+                if(enchants.length % 2 == 1) {
+                    setItemName(book, nameColor + ench.getName());
+                    inventory.setItem(13 - (enchants.length / 4) + i/2, book);
+                } else {
+                    setItemName(book, nameColor + ench.getName());
+                    inventory.setItem(4 - (enchants.length / 4) + i/2, book);
+                }
+                i++;
+            }
+        }
+
+    }
+
+    private static Enchantment[] getVanillaEnchants(ItemStack item){
+        Material mainHandMat = item.getType();
+        if(multitool.getEnchantmentLevel(item) == 1){
+            return new Enchantment[]{Enchantment.DAMAGE_ARTHROPODS, Enchantment.DIG_SPEED, Enchantment.FIRE_ASPECT,
+                    Enchantment.LOOT_BONUS_BLOCKS, Enchantment.KNOCKBACK, Enchantment.LOOT_BONUS_MOBS, Enchantment.MENDING,
+                    Enchantment.DAMAGE_ALL, Enchantment.SILK_TOUCH, Enchantment.DAMAGE_UNDEAD, Enchantment.SWEEPING_EDGE,
+                    Enchantment.DURABILITY};
+        } else if(String.valueOf(mainHandMat).contains("PICKAXE")
+                || String.valueOf(mainHandMat).contains("SPADE")){
+            return new Enchantment[]{Enchantment.DIG_SPEED, Enchantment.LOOT_BONUS_BLOCKS, Enchantment.MENDING,
+                    Enchantment.SILK_TOUCH, Enchantment.DURABILITY};
+        } else if(String.valueOf(mainHandMat).contains("AXE")){
+            return new Enchantment[]{Enchantment.DAMAGE_ARTHROPODS, Enchantment.DIG_SPEED, Enchantment.FIRE_ASPECT,
+                    Enchantment.LOOT_BONUS_BLOCKS, Enchantment.KNOCKBACK, Enchantment.LOOT_BONUS_MOBS, Enchantment.MENDING,
+                    Enchantment.DAMAGE_ALL, Enchantment.SILK_TOUCH, Enchantment.DAMAGE_UNDEAD, Enchantment.DURABILITY};
+        } else if(String.valueOf(mainHandMat).contains("SWORD")){
+            return new Enchantment[]{Enchantment.DAMAGE_ARTHROPODS, Enchantment.FIRE_ASPECT, Enchantment.KNOCKBACK,
+                    Enchantment.LOOT_BONUS_MOBS, Enchantment.MENDING, Enchantment.DAMAGE_ALL, Enchantment.DAMAGE_UNDEAD,
+                    Enchantment.SWEEPING_EDGE, Enchantment.DURABILITY};
+        } else if(String.valueOf(mainHandMat).contains("HELMET")){
+            return new Enchantment[]{Enchantment.WATER_WORKER, Enchantment.PROTECTION_EXPLOSIONS, Enchantment.PROTECTION_FIRE,
+                    Enchantment.MENDING, Enchantment.PROTECTION_PROJECTILE, Enchantment.PROTECTION_ENVIRONMENTAL,
+                    Enchantment.OXYGEN, Enchantment.THORNS, Enchantment.DURABILITY};
+        } else if(String.valueOf(mainHandMat).contains("CHESTPLATE")
+                || String.valueOf(mainHandMat).contains("LEGGINGS")){
+            return new Enchantment[]{Enchantment.PROTECTION_EXPLOSIONS, Enchantment.PROTECTION_FIRE,
+                    Enchantment.MENDING, Enchantment.PROTECTION_PROJECTILE, Enchantment.PROTECTION_ENVIRONMENTAL,
+                    Enchantment.THORNS, Enchantment.DURABILITY};
+        } else if(String.valueOf(mainHandMat).contains("BOOTS")) {
+            return new Enchantment[]{Enchantment.PROTECTION_EXPLOSIONS, Enchantment.PROTECTION_FIRE,
+                    Enchantment.MENDING, Enchantment.PROTECTION_PROJECTILE, Enchantment.PROTECTION_ENVIRONMENTAL,
+                    Enchantment.THORNS, Enchantment.DURABILITY, Enchantment.DEPTH_STRIDER, Enchantment.PROTECTION_FALL,
+                    Enchantment.FROST_WALKER};
+        } else if(String.valueOf(mainHandMat).contains("ELYTRA")) {
+            return new Enchantment[]{Enchantment.MENDING, Enchantment.DURABILITY};
+        } else if(String.valueOf(mainHandMat).contains("FISH")) {
+            return new Enchantment[]{Enchantment.MENDING, Enchantment.DURABILITY, Enchantment.LUCK, Enchantment.LURE};
+        } else if(String.valueOf(mainHandMat).contains("HOE")) {
+            return new Enchantment[]{Enchantment.MENDING, Enchantment.DURABILITY};
+        } else if(String.valueOf(mainHandMat).contains("SHIELD")) {
+            return new Enchantment[]{Enchantment.MENDING, Enchantment.DURABILITY};
+        } else if(String.valueOf(mainHandMat).contains("STEEL")) {
+            return new Enchantment[]{Enchantment.MENDING, Enchantment.DURABILITY};
+        }  else if(String.valueOf(mainHandMat).contains("BOW")) {
+            return new Enchantment[]{Enchantment.MENDING, Enchantment.DURABILITY, Enchantment.ARROW_DAMAGE,
+                    Enchantment.ARROW_FIRE, Enchantment.ARROW_INFINITE, Enchantment.ARROW_KNOCKBACK};
+        }
+        return new Enchantment[]{};
     }
 }

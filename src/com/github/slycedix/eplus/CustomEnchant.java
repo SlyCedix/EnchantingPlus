@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public abstract class CustomEnchant{
-    private final String[] romanNumerals = {"I","II","III","IV","V","VI","VII","VIII","IX","X"};
+    private final String[] romanNumerals = {"I","II","III","IV","V"};
 
     public abstract String getName();
     public abstract int getMaxLevel();
