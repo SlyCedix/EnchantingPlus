@@ -6,6 +6,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public abstract class CustomEnchant{
     private final String[] romanNumerals = {"I","II","III","IV","V","VI","VII","VIII","IX","X"};
@@ -25,9 +26,11 @@ public abstract class CustomEnchant{
                 }
                 if (getEnchantmentLevel(item) < level) {
                     int i = 0;
-                    for (String str : lore) {
-                        if (str.contains(this.getName())) {
-                            lore.remove(i);
+                    Iterator<String> iterator = lore.iterator();
+                    while(iterator.hasNext()) {
+                        String line = iterator.next();
+                        if (line.contains(this.getName())) {
+                            iterator.remove();
                         }
                     }
                     if (Arrays.asList(this.getValidItems()).contains(item.getType())) {

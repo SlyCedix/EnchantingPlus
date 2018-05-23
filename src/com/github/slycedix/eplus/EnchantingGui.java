@@ -78,11 +78,12 @@ public class EnchantingGui implements Listener {
         Player p = (Player) event.getWhoClicked();
         Inventory inventory = event.getInventory();
 
-        if((inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting") ||
-                inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting Admin")) &&
-                event.getSlotType() != InventoryType.SlotType.OUTSIDE && !event.getCurrentItem().getType().equals(Material.AIR)){
+        if((inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting")
+                || inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting Admin"))
+                && event.getSlotType() != InventoryType.SlotType.OUTSIDE
+                && !event.getCurrentItem().getType().equals(Material.AIR)){
             ItemStack clicked = event.getCurrentItem();
-            String clickedName = clicked.getItemMeta().getDisplayName();
+            String clickedName;
             ItemStack mainHand = p.getInventory().getItemInMainHand();
             String nameColor = ChatColor.DARK_AQUA + "" + ChatColor.BOLD;
             String[] enchNames = {nameColor + "Multitool", nameColor + "Expedient"};
@@ -101,6 +102,18 @@ public class EnchantingGui implements Listener {
             goBackMeta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
             goBackMeta.setLore(Arrays.asList(ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p)));
             goBack.setItemMeta(goBackMeta);
+
+            if(clicked.hasItemMeta()){
+                System.out.println("Has ItemMeta");
+                if(clicked.getItemMeta().hasDisplayName()) {
+                    System.out.println("Has DisplayName");
+                    clickedName = clicked.getItemMeta().getDisplayName();
+                }else {
+                    clickedName = "";
+                }
+            } else {
+                clickedName = "";
+            }
 
             if(clickedName.equals(enchNames[0])){
                 success = multitool.enchantItem(mainHand, (byte)1);
@@ -123,17 +136,19 @@ public class EnchantingGui implements Listener {
                 inventory.setItem(14, enchantedBooks[2]);
                 inventory.setItem(31, goBack);
             }else if(clickedName.contains(enchNames[1] + " ")){
-                System.out.println(clickedName);
-                if(clicked.getItemMeta().getDisplayName().equals(enchNames[1] + " I") && (10000> getExpAtLevel(15) || inventory.getName().contains("Admin"))){
-                    System.out.println(clickedName);
+                if(clickedName.equals(enchNames[1] + " I")
+                        && (getPlayerExp(p) > getExpAtLevel(15)
+                        || inventory.getName().contains("Admin"))){
                     success = expedient.enchantItem(mainHand, (byte) 1);
                     deduction = 15;
-                } else if(clicked.getItemMeta().getDisplayName().equals(enchNames[1] + " II") && (10000 > getExpAtLevel(30) || inventory.getName().contains("Admin"))){
-                    System.out.println(clickedName);
+                } else if(clickedName.equals(enchNames[1] + " II")
+                        && (getPlayerExp(p) > getExpAtLevel(30)
+                        || inventory.getName().contains("Admin"))){
                     success = expedient.enchantItem(mainHand, (byte) 2);
                     deduction = 30;
-                } else if(clicked.getItemMeta().getDisplayName().equals(enchNames[1] + " III") && (10000> getExpAtLevel(45) || inventory.getName().contains("Admin"))){
-                    System.out.println(clickedName);
+                } else if(clickedName.equals(enchNames[1] + " III")
+                        && (getPlayerExp(p) > getExpAtLevel(45)
+                        || inventory.getName().contains("Admin"))){
                     success = expedient.enchantItem(mainHand, (byte) 3);
                     deduction = 45;
                 }
@@ -157,7 +172,7 @@ public class EnchantingGui implements Listener {
             event.setCancelled(true);
         }
     }
-    // Calculate amount of EXP needed to level up
+
     private static int getExpToLevelUp(int level){
         if(level <= 15){
             return 2*level+7;
@@ -168,7 +183,6 @@ public class EnchantingGui implements Listener {
         }
     }
 
-    // Calculate total experience up to a level
     private static int getExpAtLevel(int level){
         if(level <= 16){
             return (int) (Math.pow(level,2) + 6*level);
@@ -179,34 +193,26 @@ public class EnchantingGui implements Listener {
         }
     }
 
-    // Calculate player's current EXP amount
     private static int getPlayerExp(Player player){
         int exp = 0;
         int level = player.getLevel();
 
-        // Get the amount of XP in past levels
         exp += getExpAtLevel(level);
 
-        // Get amount of XP towards next level
         exp += Math.round(getExpToLevelUp(level) * player.getExp());
 
         return exp;
     }
 
-    // Give or take EXP
     private static int changePlayerExp(Player player, int exp){
-        // Get player's current exp
         int currentExp = getPlayerExp(player);
 
-        // Reset player's current exp to 0
         player.setExp(0);
         player.setLevel(0);
 
-        // Give the player their exp back, with the difference
         int newExp = currentExp + exp;
         player.giveExp(newExp);
 
-        // Return the player's new exp amount
         return newExp;
     }
 }
