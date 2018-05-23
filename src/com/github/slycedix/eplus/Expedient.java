@@ -13,12 +13,26 @@ import org.bukkit.inventory.ItemStack;
 public class Expedient extends CustomEnchant implements Listener {
     @Override
     public String getName(){
-        return ChatColor.AQUA + "Expedient";
+        return "Expedient";
     }
 
     @Override
+    public String getNameColor() {
+        return ChatColor.AQUA + "";
+    }
+    @Override
     public String getDescription() {
-        return ChatColor.ITALIC + "" + ChatColor.GRAY + "Increases the swing speed of your tool";
+        return "Increases the swing speed of your tool";
+    }
+
+    @Override
+    public String getDescriptionColor() {
+        return ChatColor.ITALIC + "" + ChatColor.GRAY + "";
+    }
+
+    @Override
+    public Material getDisplayMaterial() {
+        return Material.SUGAR;
     }
 
     @Override
@@ -28,12 +42,11 @@ public class Expedient extends CustomEnchant implements Listener {
 
     @Override
     public Material[] getValidItems(){
-        Material[] validItems = {Material.WOOD_PICKAXE, Material.WOOD_AXE, Material.WOOD_SPADE, Material.WOOD_SWORD,
+        return new Material[]{Material.WOOD_PICKAXE, Material.WOOD_AXE, Material.WOOD_SPADE, Material.WOOD_SWORD,
                 Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_SPADE, Material.STONE_SWORD,
                 Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_SPADE, Material.IRON_SWORD,
                 Material.GOLD_PICKAXE, Material.GOLD_AXE, Material.GOLD_SPADE, Material.GOLD_SWORD,
                 Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_SPADE, Material.DIAMOND_SWORD};
-        return validItems;
     }
 
     @EventHandler

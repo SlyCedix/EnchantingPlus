@@ -36,12 +36,27 @@ public class Multitool extends CustomEnchant implements Listener {
 
     @Override
     public String getName(){
-        return ChatColor.AQUA + "Multitool";
+        return "Multitool";
+    }
+
+    @Override
+    public String getNameColor() {
+        return ChatColor.AQUA + "";
     }
 
     @Override
     public String getDescription() {
-        return ChatColor.ITALIC + "" + ChatColor.GRAY + "Transforms tool into the tool needed for the task at hand";
+        return "Transforms tool into the tool needed for the task at hand";
+    }
+
+    @Override
+    public String getDescriptionColor() {
+        return ChatColor.ITALIC + "" + ChatColor.GRAY + "";
+    }
+
+    @Override
+    public Material getDisplayMaterial() {
+        return Material.DIAMOND_PICKAXE;
     }
 
     @Override
@@ -51,12 +66,11 @@ public class Multitool extends CustomEnchant implements Listener {
 
     @Override
     public Material[] getValidItems(){
-        Material[] validItems = {Material.WOOD_PICKAXE, Material.WOOD_AXE, Material.WOOD_SPADE, Material.WOOD_SWORD,
+        return new Material[]{Material.WOOD_PICKAXE, Material.WOOD_AXE, Material.WOOD_SPADE, Material.WOOD_SWORD,
                 Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_SPADE, Material.STONE_SWORD,
                 Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_SPADE, Material.IRON_SWORD,
                 Material.GOLD_PICKAXE, Material.GOLD_AXE, Material.GOLD_SPADE, Material.GOLD_SWORD,
                 Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_SPADE, Material.DIAMOND_SWORD};
-        return validItems;
     }
 
     @EventHandler

@@ -15,6 +15,17 @@ public abstract class CustomEnchant{
     public abstract int getMaxLevel();
     public abstract Material[] getValidItems();
     public abstract String getDescription();
+    public abstract String getNameColor();
+    public abstract String getDescriptionColor();
+    public abstract Material getDisplayMaterial();
+
+    String getColoredName(){
+        return getNameColor() + getName();
+    }
+
+    String getColoredDescription(){
+        return getDescriptionColor() + getDescription();
+    }
 
     boolean enchantItem(ItemStack item, byte level){
         if(item != null && item.getType() != Material.AIR) {
@@ -25,23 +36,22 @@ public abstract class CustomEnchant{
                     lore.addAll(meta.getLore());
                 }
                 if (getEnchantmentLevel(item) < level) {
-                    int i = 0;
                     Iterator<String> iterator = lore.iterator();
                     while(iterator.hasNext()) {
                         String line = iterator.next();
-                        if (line.contains(this.getName())) {
+                        if (line.contains(this.getColoredName())) {
                             iterator.remove();
                         }
                     }
                     if (Arrays.asList(this.getValidItems()).contains(item.getType())) {
                         if (level <= 10) {
                             if (this.getMaxLevel() == 1) {
-                                lore.add(this.getName());
+                                lore.add(this.getColoredName());
                             } else {
-                                lore.add(this.getName() + " " + romanNumerals[level - 1]);
+                                lore.add(this.getColoredName() + " " + romanNumerals[level - 1]);
                             }
                         } else {
-                            lore.add(this.getName() + " " + level);
+                            lore.add(this.getColoredName() + " " + level);
                         }
                         meta.setLore(lore);
                         item.setItemMeta(meta);
@@ -64,16 +74,18 @@ public abstract class CustomEnchant{
 
             if (this.getMaxLevel() > 1) {
                 byte currLevel = 0;
-                for (String str : lore) {
-                    if (str.contains(this.getName())) {
-                        String levelStr = str.substring(this.getName().length() + 1);
+                Iterator<String> iterator = lore.iterator();
+                while(iterator.hasNext()) {
+                    String line = iterator.next();
+                    if (line.contains(this.getName())) {
+                        String levelStr = line.substring(this.getColoredName().length() + 1);
                         currLevel = (byte) (Arrays.asList(romanNumerals).indexOf(levelStr) + 1);
                         break;
                     }
                 }
                 return currLevel;
             } else {
-                if (lore.contains(this.getName())) {
+                if (lore.contains(this.getColoredName())) {
                     return 1;
                 } else {
                     return 0;
