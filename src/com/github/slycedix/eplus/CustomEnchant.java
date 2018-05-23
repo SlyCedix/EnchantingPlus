@@ -19,7 +19,7 @@ public abstract class CustomEnchant{
     boolean enchantItem(ItemStack item, byte level){
         if(item != null && item.getType() != Material.AIR) {
             ItemMeta meta = item.getItemMeta();
-            ArrayList<String> lore = new ArrayList<>();
+            ArrayList<String> lore = new ArrayList<String>();
             if (level > 0) {
                 if (meta.hasLore()) {
                     lore.addAll(meta.getLore());
@@ -59,7 +59,7 @@ public abstract class CustomEnchant{
             if (!meta.hasLore()) {
                 return 0;
             }
-            ArrayList<String> lore = new ArrayList<>();
+            ArrayList<String> lore = new ArrayList<String>();
             lore.addAll(meta.getLore());
 
             if (this.getMaxLevel() > 1) {

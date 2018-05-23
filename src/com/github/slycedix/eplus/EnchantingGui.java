@@ -27,20 +27,15 @@ public class EnchantingGui implements Listener {
         } else {
             enchantingGUI = Bukkit.createInventory(null, 36, ChatColor.DARK_GREEN + "Enchanting");
         }
-        ItemStack prev = new ItemStack(Material.PAPER);
-        ItemStack next = new ItemStack(Material.PAPER);
         ItemStack filler = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15);
+        ItemStack vanillaEnchants = new ItemStack(Material.ENCHANTMENT_TABLE);
 
-        ItemMeta prevMeta = prev.getItemMeta();
-        ItemMeta nextMeta = next.getItemMeta();
         ItemMeta fillerMeta = filler.getItemMeta();
+        ItemMeta vanillaEnchantsMeta = vanillaEnchants.getItemMeta();
 
-        prevMeta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Previous Page");
-        nextMeta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Next Page");
         fillerMeta.setDisplayName(" ");
+        vanillaEnchantsMeta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Vanilla Enchants");
 
-        prev.setItemMeta(prevMeta);
-        next.setItemMeta(nextMeta);
         filler.setItemMeta(fillerMeta);
 
         ItemStack multiPick = new ItemStack(Material.DIAMOND_PICKAXE);
@@ -52,22 +47,28 @@ public class EnchantingGui implements Listener {
         multiPickMeta.setDisplayName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Multitool");
         expedSugarMeta.setDisplayName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Expedient");
 
-        ArrayList<String> multiPickLore = new ArrayList<>();
-        ArrayList<String> expedSugarLore = new ArrayList<>();
+        ArrayList<String> multiPickLore = new ArrayList<String>();
+        ArrayList<String> expedSugarLore = new ArrayList<String>();
 
         multiPickLore.add(multitool.getDescription());
         expedSugarLore.add(expedient.getDescription());
 
+        multiPickLore.add(ChatColor.GREEN + "XP Cost: " + getExpAtLevel(60));
+
         multiPickMeta.setLore(multiPickLore);
         expedSugarMeta.setLore(expedSugarLore);
+        vanillaEnchantsMeta.setLore(Arrays.asList(ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p)));
 
         multiPick.setItemMeta(multiPickMeta);
         expedSugar.setItemMeta(expedSugarMeta);
+        vanillaEnchants.setItemMeta(vanillaEnchantsMeta);
+
         for(int i  = 0; i < 36; i++){
             enchantingGUI.setItem(i, filler);
         }
         enchantingGUI.setItem(12, expedSugar);
         enchantingGUI.setItem(13, multiPick);
+        enchantingGUI.setItem(31, vanillaEnchants);
 
         p.openInventory(enchantingGUI);
         return true;
