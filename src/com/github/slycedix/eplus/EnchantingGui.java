@@ -53,7 +53,7 @@ public class EnchantingGui implements Listener {
         multiPickLore.add(multitool.getDescription());
         expedSugarLore.add(expedient.getDescription());
 
-        multiPickLore.add(ChatColor.GREEN + "XP Cost: " + getExpAtLevel(60));
+        multiPickLore.add(ChatColor.GREEN + "XP Cost: " + getExpAtLevel(50));
 
         multiPickMeta.setLore(multiPickLore);
         expedSugarMeta.setLore(expedSugarLore);
@@ -117,7 +117,10 @@ public class EnchantingGui implements Listener {
             }
 
             if(clickedName.equals(enchNames[0])){
-                success = multitool.enchantItem(mainHand, (byte)1);
+                if((getPlayerExp(p) > getExpAtLevel(50)
+                        || inventory.getName().contains("Admin"))) {
+                    success = multitool.enchantItem(mainHand, (byte) 1);
+                }
                 attemptedEnchant = true;
             }else if(clickedName.equals(enchNames[1])){
                 enchantedBooksMeta[0].setDisplayName(enchNames[1] + " I");
