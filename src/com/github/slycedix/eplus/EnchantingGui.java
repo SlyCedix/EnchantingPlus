@@ -1,7 +1,7 @@
 package com.github.slycedix.eplus;
 
 
-import net.minecraft.server.v1_12_R1.ItemAxe;
+import com.meowj.langutils.lang.LanguageHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -18,11 +18,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static org.bukkit.enchantments.Enchantment.values;
+
 public class EnchantingGui implements Listener {
     private static Multitool multitool = new Multitool();
     private static Expedient expedient = new Expedient();
 
     private static CustomEnchant[] enchants = {multitool, expedient};
+
     private final static String[] romanNumerals = {"I","II","III","IV","V"};
     private static String nameColor = ChatColor.DARK_AQUA + "" + ChatColor.BOLD;
 
@@ -81,14 +84,24 @@ public class EnchantingGui implements Listener {
                 levelsPop = true;
             }
         }
+
+        Enchantment[] vanillaEnchants = getVanillaEnchants(p.getInventory().getItemInMainHand());
+        for(Enchantment ench : vanillaEnchants){
+            if(clickedName.equals(nameColor + LanguageHelper.getEnchantmentName(ench, p))){
+                populateVanillaLevels(ench, inventory, p);
+                levelsPop = true;
+            }
+        }
+
         if(!levelsPop) {
             if (clickedName.contains("Go Back")) {
                 p.closeInventory();
                 openGUI(p, inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting Admin"));
             } else if(clickedName.contains("Vanilla")) {
-
+                populateVanillaEnchants(inventory, p);
             } else {
                 getEnchantFromName(clickedName, p, inventory);
+                getVanillaEnchantFromName(clickedName, p, inventory);
             }
         }
     }
@@ -138,7 +151,7 @@ public class EnchantingGui implements Listener {
 
     private static void addLoreToItem(ItemStack item, String str){
         ItemMeta itemMeta = item.getItemMeta();
-        ArrayList<String> lore = new ArrayList<String>();
+        ArrayList<String> lore = new ArrayList<>();
         if(itemMeta.hasLore()){
             lore.addAll(itemMeta.getLore());
         }
@@ -149,7 +162,7 @@ public class EnchantingGui implements Listener {
 
     private static void setLoreOfItem(ItemStack item, String str){
         ItemMeta itemMeta = item.getItemMeta();
-        ArrayList<String> lore = new ArrayList<String>();
+        ArrayList<String> lore = new ArrayList<>();
         lore.add(str);
         itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
@@ -228,7 +241,7 @@ public class EnchantingGui implements Listener {
             ItemStack item = new ItemStack(ench.getDisplayMaterial());
             setItemName(item, nameColor + ench.getName());
             addLoreToItem(item, ench.getColoredDescription());
-            inventory.setItem(13 - (enchants.length / 2) + i,item);
+            inventory.setItem(getBookPosition(i),item);
             i++;
         }
     }
@@ -245,24 +258,17 @@ public class EnchantingGui implements Listener {
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
 
         int i = 0;
-
-        if(possibleEnchants.length <= 7){
+        int len = possibleEnchants.length;
+        if(len > 0){
             for(Enchantment ench : possibleEnchants){
-                setItemName(book, nameColor + ench.getName());
-                inventory.setItem(13 - (enchants.length / 2) + i,book);
+                setItemName(book, nameColor + LanguageHelper.getEnchantmentName(ench, p));
+                inventory.setItem(getBookPosition(i),book);
                 i++;
             }
-        }  else if(possibleEnchants.length > 7){
-            for(Enchantment ench : possibleEnchants){
-                if(enchants.length % 2 == 1) {
-                    setItemName(book, nameColor + ench.getName());
-                    inventory.setItem(13 - (enchants.length / 4) + i/2, book);
-                } else {
-                    setItemName(book, nameColor + ench.getName());
-                    inventory.setItem(4 - (enchants.length / 4) + i/2, book);
-                }
-                i++;
-            }
+        } else {
+            ItemStack nope = new ItemStack(Material.BARRIER);
+            setItemName(nope, ChatColor.BOLD + "" + ChatColor.RED + "No available enchantments for that tool");
+            inventory.setItem(13, nope);
         }
 
     }
@@ -315,5 +321,68 @@ public class EnchantingGui implements Listener {
                     Enchantment.ARROW_FIRE, Enchantment.ARROW_INFINITE, Enchantment.ARROW_KNOCKBACK};
         }
         return new Enchantment[]{};
+    }
+
+    private static void populateVanillaLevels(Enchantment enchant, Inventory  inventory, Player p){
+        ItemStack enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
+
+        ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
+        setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+        addLoreToItem(goBack, ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
+        fillInventory(inventory);
+        inventory.setItem(31, goBack);
+
+        for(int i = 0; i < enchant.getMaxLevel(); i++){
+            setItemName(enchantedBook, nameColor + LanguageHelper.getEnchantmentName(enchant, p) + " " + romanNumerals[i]);
+            setLoreOfItem(enchantedBook, ChatColor.GRAY + "" + ChatColor.ITALIC + "XP Cost: " + getExpAtLevel(60/enchant.getMaxLevel() * (i+1)));
+            inventory.setItem(13 - (enchant.getMaxLevel() / 2)  + i, enchantedBook);
+        }
+    }
+
+    private static int getBookPosition(int book){
+        int[] positions = {13,4,12,14,3,5,11,15,2,6,10,16,1,7};
+        return positions[book];
+    }
+
+    private static void getVanillaEnchantFromName(String name, Player p, Inventory inventory){
+        Enchantment[] allEnch = values();
+        ItemStack item = p.getInventory().getItemInMainHand();
+        for(Enchantment ench : allEnch){
+            if(name.contains(LanguageHelper.getEnchantmentName(ench,p))){
+                if(ench.getMaxLevel() > 1){
+                    String roman = name.substring(5 + LanguageHelper.getEnchantmentName(ench,p).length());
+                    byte level = (byte) (Arrays.asList(romanNumerals).indexOf(roman) + 1);
+                    if(getPlayerExp(p) > getExpAtLevel((60/ench.getMaxLevel()) * level) || inventory.getName().contains("Admin")) {
+                        if(item.getEnchantmentLevel(ench) < level){
+                            item.addUnsafeEnchantment(ench, level);
+                            if(!inventory.getName().contains("Admin")) {
+                                changePlayerExp(p, -1 * getExpAtLevel((60 / ench.getMaxLevel()) * level));
+                            }
+                        } else {
+                            p.sendMessage(ChatColor.RED + "Enchantment Failed");
+                        }
+                    } else {
+                        p.sendMessage(ChatColor.RED + "You do not have enough XP for that enchantment");
+                    }
+                } else {
+                    if(getPlayerExp(p) > getExpAtLevel(60) || inventory.getName().contains("Admin")) {
+                        if(!item.containsEnchantment(ench)){
+                            item.addUnsafeEnchantment(ench, 1);
+                            if(!inventory.getName().contains("Admin")) {
+                                changePlayerExp(p, -1 * getExpAtLevel(60));
+                            }
+                        } else {
+                            p.sendMessage(ChatColor.RED + "Enchantment Failed");
+                        }
+                    } else {
+                        p.sendMessage(ChatColor.RED + "You do not have enough XP for that enchantment");
+                    }
+                }
+            }
+            ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
+            setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+            addLoreToItem(goBack, ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
+            inventory.setItem(31, goBack);
+        }
     }
 }
