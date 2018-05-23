@@ -84,96 +84,100 @@ public class EnchantingGui implements Listener {
                 && event.getSlotType() != InventoryType.SlotType.OUTSIDE
                 && !event.getCurrentItem().getType().equals(Material.AIR)){
             ItemStack clicked = event.getCurrentItem();
-            String clickedName;
-            ItemStack mainHand = p.getInventory().getItemInMainHand();
-            String nameColor = ChatColor.DARK_AQUA + "" + ChatColor.BOLD;
-            String[] enchNames = {nameColor + "Multitool", nameColor + "Expedient"};
-            Boolean success = false;
-            Boolean attemptedEnchant = false;
-            int deduction = 0;
 
-            ItemStack[] enchantedBooks = {new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK),
-                    new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK)};
-
-            ItemMeta[] enchantedBooksMeta = {enchantedBooks[0].getItemMeta(), enchantedBooks[0].getItemMeta(),
-                    enchantedBooks[0].getItemMeta(),enchantedBooks[0].getItemMeta(), enchantedBooks[0].getItemMeta()};
-
-            ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
-            ItemMeta goBackMeta = goBack.getItemMeta();
-            goBackMeta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
-            goBackMeta.setLore(Arrays.asList(ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p)));
-            goBack.setItemMeta(goBackMeta);
-
-            if(clicked.hasItemMeta()){
-                System.out.println("Has ItemMeta");
-                if(clicked.getItemMeta().hasDisplayName()) {
-                    System.out.println("Has DisplayName");
-                    clickedName = clicked.getItemMeta().getDisplayName();
-                }else {
-                    clickedName = "";
-                }
-            } else {
-                clickedName = "";
-            }
-
-            if(clickedName.equals(enchNames[0])){
-                if((getPlayerExp(p) > getExpAtLevel(50)
-                        || inventory.getName().contains("Admin"))) {
-                    success = multitool.enchantItem(mainHand, (byte) 1);
-                }
-                attemptedEnchant = true;
-            }else if(clickedName.equals(enchNames[1])){
-                enchantedBooksMeta[0].setDisplayName(enchNames[1] + " I");
-                enchantedBooksMeta[1].setDisplayName(enchNames[1] + " II");
-                enchantedBooksMeta[2].setDisplayName(enchNames[1] + " III");
-
-                enchantedBooksMeta[0].setLore(Arrays.asList(ChatColor.GRAY + "" + ChatColor.ITALIC + "XP Cost: " + getExpAtLevel(15)));
-                enchantedBooksMeta[1].setLore(Arrays.asList(ChatColor.GRAY + "" + ChatColor.ITALIC + "XP Cost: " + getExpAtLevel(30)));
-                enchantedBooksMeta[2].setLore(Arrays.asList(ChatColor.GRAY + "" + ChatColor.ITALIC + "XP Cost: " + getExpAtLevel(45)));
-
-                enchantedBooks[0].setItemMeta(enchantedBooksMeta[0]);
-                enchantedBooks[1].setItemMeta(enchantedBooksMeta[1]);
-                enchantedBooks[2].setItemMeta(enchantedBooksMeta[2]);
-
-                inventory.setItem(12, enchantedBooks[0]);
-                inventory.setItem(13, enchantedBooks[1]);
-                inventory.setItem(14, enchantedBooks[2]);
-                inventory.setItem(31, goBack);
-            }else if(clickedName.contains(enchNames[1] + " ")){
-                if(clickedName.equals(enchNames[1] + " I")
-                        && (getPlayerExp(p) > getExpAtLevel(15)
-                        || inventory.getName().contains("Admin"))){
-                    success = expedient.enchantItem(mainHand, (byte) 1);
-                    deduction = 15;
-                } else if(clickedName.equals(enchNames[1] + " II")
-                        && (getPlayerExp(p) > getExpAtLevel(30)
-                        || inventory.getName().contains("Admin"))){
-                    success = expedient.enchantItem(mainHand, (byte) 2);
-                    deduction = 30;
-                } else if(clickedName.equals(enchNames[1] + " III")
-                        && (getPlayerExp(p) > getExpAtLevel(45)
-                        || inventory.getName().contains("Admin"))){
-                    success = expedient.enchantItem(mainHand, (byte) 3);
-                    deduction = 45;
-                }
-                attemptedEnchant = true;
-            } else if(clickedName.equals(goBack.getItemMeta().getDisplayName())){
-                p.closeInventory();
-                openGUI(p, inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting Admin"));
-            }
-
-            if(attemptedEnchant) {
-                if (success) {
-                    p.sendMessage(ChatColor.GREEN + "Enchantment Successful");
-                    if(!inventory.getName().contains("Admin")) {
-                        changePlayerExp(p, -1 * getExpAtLevel(deduction));
-                    }
-                }else{
-                    p.sendMessage(ChatColor.RED + "Enchantment Unsuccessful");
-                }
-            }
+            clickAction(p, inventory, clicked);
 
             event.setCancelled(true);
+        }
+    }
+
+    private void clickAction(Player p, Inventory inventory, ItemStack clicked) {
+        ItemStack mainHand = p.getInventory().getItemInMainHand();
+        String nameColor = ChatColor.DARK_AQUA + "" + ChatColor.BOLD;
+        String[] enchNames = {nameColor + "Multitool", nameColor + "Expedient"};
+        Boolean success = false;
+        Boolean attemptedEnchant = false;
+        int deduction = 0;
+        ItemStack[] enchantedBooks = {new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK),
+                new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK), new ItemStack(Material.ENCHANTED_BOOK)};
+
+        ItemMeta[] enchantedBooksMeta = {enchantedBooks[0].getItemMeta(), enchantedBooks[0].getItemMeta(),
+                enchantedBooks[0].getItemMeta(),enchantedBooks[0].getItemMeta(), enchantedBooks[0].getItemMeta()};
+
+        ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
+        ItemMeta goBackMeta = goBack.getItemMeta();
+        goBackMeta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+        goBackMeta.setLore(Arrays.asList(ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p)));
+        goBack.setItemMeta(goBackMeta);
+
+        String clickedName;
+        if(clicked.hasItemMeta()){
+            System.out.println("Has ItemMeta");
+            if(clicked.getItemMeta().hasDisplayName()) {
+                System.out.println("Has DisplayName");
+                clickedName = clicked.getItemMeta().getDisplayName();
+            }else {
+                clickedName = "";
+            }
+        } else {
+            clickedName = "";
+        }
+
+        if(clickedName.equals(enchNames[0])){
+            if((getPlayerExp(p) > getExpAtLevel(50)
+                    || inventory.getName().contains("Admin"))) {
+                success = multitool.enchantItem(mainHand, (byte) 1);
+            }
+            attemptedEnchant = true;
+        }else if(clickedName.equals(enchNames[1])){
+            enchantedBooksMeta[0].setDisplayName(enchNames[1] + " I");
+            enchantedBooksMeta[1].setDisplayName(enchNames[1] + " II");
+            enchantedBooksMeta[2].setDisplayName(enchNames[1] + " III");
+
+            enchantedBooksMeta[0].setLore(Arrays.asList(ChatColor.GRAY + "" + ChatColor.ITALIC + "XP Cost: " + getExpAtLevel(15)));
+            enchantedBooksMeta[1].setLore(Arrays.asList(ChatColor.GRAY + "" + ChatColor.ITALIC + "XP Cost: " + getExpAtLevel(30)));
+            enchantedBooksMeta[2].setLore(Arrays.asList(ChatColor.GRAY + "" + ChatColor.ITALIC + "XP Cost: " + getExpAtLevel(45)));
+
+            enchantedBooks[0].setItemMeta(enchantedBooksMeta[0]);
+            enchantedBooks[1].setItemMeta(enchantedBooksMeta[1]);
+            enchantedBooks[2].setItemMeta(enchantedBooksMeta[2]);
+
+            inventory.setItem(12, enchantedBooks[0]);
+            inventory.setItem(13, enchantedBooks[1]);
+            inventory.setItem(14, enchantedBooks[2]);
+            inventory.setItem(31, goBack);
+        }else if(clickedName.contains(enchNames[1] + " ")){
+            if(clickedName.equals(enchNames[1] + " I")
+                    && (getPlayerExp(p) > getExpAtLevel(15)
+                    || inventory.getName().contains("Admin"))){
+                success = expedient.enchantItem(mainHand, (byte) 1);
+                deduction = 15;
+            } else if(clickedName.equals(enchNames[1] + " II")
+                    && (getPlayerExp(p) > getExpAtLevel(30)
+                    || inventory.getName().contains("Admin"))){
+                success = expedient.enchantItem(mainHand, (byte) 2);
+                deduction = 30;
+            } else if(clickedName.equals(enchNames[1] + " III")
+                    && (getPlayerExp(p) > getExpAtLevel(45)
+                    || inventory.getName().contains("Admin"))){
+                success = expedient.enchantItem(mainHand, (byte) 3);
+                deduction = 45;
+            }
+            attemptedEnchant = true;
+        } else if(clickedName.equals(goBack.getItemMeta().getDisplayName())){
+            p.closeInventory();
+            openGUI(p, inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting Admin"));
+        }
+
+        if(attemptedEnchant) {
+            if (success) {
+                p.sendMessage(ChatColor.GREEN + "Enchantment Successful");
+                if(!inventory.getName().contains("Admin")) {
+                    changePlayerExp(p, -1 * getExpAtLevel(deduction));
+                }
+            }else{
+                p.sendMessage(ChatColor.RED + "Enchantment Unsuccessful");
+            }
         }
     }
 
