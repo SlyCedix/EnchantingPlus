@@ -11,7 +11,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class Multitool extends CustomEnchant implements Listener {
-    public enum tool{PICKAXE("_PICKAXE"), AXE("_AXE"), SPADE("_SPADE"), ANY("");
+    public enum tool{PICKAXE("PICKAXE"), AXE("AXE"), SPADE("SPADE"), ANY("");
         private String type;
 
         tool(String type) {
@@ -22,7 +22,7 @@ public class Multitool extends CustomEnchant implements Listener {
             return type;
         }
     }
-    public enum mat{WOOD("WOOD"), STONE("STONE"), GOLD("GOLD"), IRON("IRON"), DIAMOND("DIAMOND");
+    public enum mat{WOOD("WOOD_"), STONE("STONE_"), GOLD("GOLD_"), IRON("IRON_"), DIAMOND("DIAMOND_");
         private String type;
 
         mat(String type) {
@@ -78,7 +78,7 @@ public class Multitool extends CustomEnchant implements Listener {
         Player p = event.getPlayer();
         ItemStack mainHand = p.getInventory().getItemInMainHand();
         if(getEnchantmentLevel(mainHand) > 0){
-            tool neededTool = ToolBrokenBy(event);
+            tool neededTool = getToolBrokenBy(event);
             mat toolMaterial = getItemMaterial(mainHand);
             if(!neededTool.equals(tool.ANY)){
                 mainHand.setType(Material.valueOf(toolMaterial.getType() + neededTool.getType()));
@@ -98,7 +98,7 @@ public class Multitool extends CustomEnchant implements Listener {
         }
     }
 
-    private static tool ToolBrokenBy(BlockDamageEvent event){
+    private static tool getToolBrokenBy(BlockDamageEvent event){
         net.minecraft.server.v1_12_R1.Block nmsBlock = net.minecraft.server.v1_12_R1.Block.getById(event.getBlock().getTypeId());
         if(net.minecraft.server.v1_12_R1.Item.getById(278).getDestroySpeed(CraftItemStack.asNMSCopy(event.getItemInHand()),nmsBlock.getBlockData()) > 1.0f)
             return tool.PICKAXE;
