@@ -14,3 +14,4 @@ permissions:
   eplus.admin:
     description: Allows user to open the administrator enchanting menu
     default: op
+depend: [LangUtils]
