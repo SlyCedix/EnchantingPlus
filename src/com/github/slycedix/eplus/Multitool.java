@@ -93,7 +93,7 @@ public class Multitool extends CustomEnchant implements Listener {
             ItemStack mainHand = p.getInventory().getItemInMainHand();
             if(getEnchantmentLevel(mainHand) > 0){
                 mat toolMaterial = getItemMaterial(mainHand);
-                mainHand.setType(Material.valueOf(toolMaterial.getType() + "_SWORD"));
+                mainHand.setType(Material.valueOf(toolMaterial.getType() + "SWORD"));
             }
         }
     }
