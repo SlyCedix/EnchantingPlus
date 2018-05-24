@@ -193,7 +193,7 @@ public class EnchantingGui implements Listener {
                     String roman = name.substring(5 + ench.getName().length());
                     byte level = (byte) (Arrays.asList(romanNumerals).indexOf(roman) + 1);
                     if(getPlayerExp(p) > getExpAtLevel((60/ench.getMaxLevel()) * level) || inventory.getName().contains("Admin")) {
-                        if(ench.enchantItem(p.getInventory().getItemInMainHand(), level)){
+                        if(ench.enchantItem(p.getInventory().getItemInMainHand(), level) && !inventory.getName().contains("Admin")){
                             changePlayerExp(p, -1 * getExpAtLevel((60/ench.getMaxLevel()) * level));
                         } else {
                             p.sendMessage(ChatColor.RED + "Enchantment Failed");
@@ -203,7 +203,7 @@ public class EnchantingGui implements Listener {
                     }
                 } else {
                     if(getPlayerExp(p) > getExpAtLevel(60) || inventory.getName().contains("Admin")) {
-                        if(ench.enchantItem(p.getInventory().getItemInMainHand(), (byte) 1)){
+                        if(ench.enchantItem(p.getInventory().getItemInMainHand(), (byte) 1) && !inventory.getName().contains("Admin")){
                             changePlayerExp(p, -1 * getExpAtLevel(60));
                         } else {
                             p.sendMessage(ChatColor.RED + "Enchantment Failed");
