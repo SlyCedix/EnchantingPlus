@@ -38,13 +38,7 @@ public class EnchantingGui implements Listener {
             enchantingGUI = Bukkit.createInventory(null, 36, ChatColor.DARK_GREEN + "Enchanting");
         }
 
-        ItemStack vanillaEnchants = new ItemStack(Material.ENCHANTMENT_TABLE);
-        setItemName(vanillaEnchants, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Vanilla Enchants");
-        addLoreToItem(vanillaEnchants,ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
-
-        populateCustomEnchants(enchantingGUI);
-
-        enchantingGUI.setItem(31, vanillaEnchants);
+        populateCustomEnchants(enchantingGUI, p);
 
         p.openInventory(enchantingGUI);
         return true;
@@ -94,9 +88,8 @@ public class EnchantingGui implements Listener {
         }
 
         if(!levelsPop) {
-            if (clickedName.contains("Go Back")) {
-                p.closeInventory();
-                openGUI(p, inventory.getName().equals(ChatColor.DARK_GREEN + "Enchanting Admin"));
+            if (clickedName.contains("Eplus")) {
+                populateCustomEnchants(inventory, p);
             } else if(clickedName.contains("Vanilla")) {
                 populateVanillaEnchants(inventory, p);
             } else {
@@ -178,7 +171,7 @@ public class EnchantingGui implements Listener {
         ItemStack enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
 
         ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
-        setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+        setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back to Eplus Enchants");
         addLoreToItem(goBack, ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
         fillInventory(inventory);
         inventory.setItem(31, goBack);
@@ -220,7 +213,7 @@ public class EnchantingGui implements Listener {
                 }
             }
             ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
-            setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+            setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Eplus Enchants");
             addLoreToItem(goBack, ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
             inventory.setItem(31, goBack);
         }
@@ -234,7 +227,7 @@ public class EnchantingGui implements Listener {
         }
     }
 
-    private static void populateCustomEnchants(Inventory inventory){
+    private static void populateCustomEnchants(Inventory inventory, Player p){
         fillInventory(inventory);
         int i = 0;
         for(CustomEnchant ench : enchants){
@@ -244,12 +237,16 @@ public class EnchantingGui implements Listener {
             inventory.setItem(getBookPosition(i),item);
             i++;
         }
+        ItemStack vanillaEnchants = new ItemStack(Material.ENCHANTMENT_TABLE);
+        setItemName(vanillaEnchants, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Vanilla Enchants");
+        addLoreToItem(vanillaEnchants,ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
+        inventory.setItem(31, vanillaEnchants);
     }
 
     private static void populateVanillaEnchants(Inventory inventory, Player p){
         fillInventory(inventory);
         ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
-        setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+        setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Eplus Enchants");
         addLoreToItem(goBack, ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
         inventory.setItem(31, goBack);
 
@@ -327,7 +324,7 @@ public class EnchantingGui implements Listener {
         ItemStack enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
 
         ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
-        setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+        setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back to Vanilla Enchants");
         addLoreToItem(goBack, ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
         fillInventory(inventory);
         inventory.setItem(31, goBack);
@@ -353,7 +350,7 @@ public class EnchantingGui implements Listener {
                     String roman = name.substring(5 + LanguageHelper.getEnchantmentName(ench,p).length());
                     byte level = (byte) (Arrays.asList(romanNumerals).indexOf(roman) + 1);
                     if(getPlayerExp(p) > getExpAtLevel((60/ench.getMaxLevel()) * level) || inventory.getName().contains("Admin")) {
-                        if(item.getEnchantmentLevel(ench) < level){
+                        if(item.getEnchantmentLevel(ench) < level && !hasConflicts(ench,item)){
                             item.addUnsafeEnchantment(ench, level);
                             if(!inventory.getName().contains("Admin")) {
                                 changePlayerExp(p, -1 * getExpAtLevel((60 / ench.getMaxLevel()) * level));
@@ -366,7 +363,7 @@ public class EnchantingGui implements Listener {
                     }
                 } else {
                     if(getPlayerExp(p) > getExpAtLevel(60) || inventory.getName().contains("Admin")) {
-                        if(!item.containsEnchantment(ench)){
+                        if(!item.containsEnchantment(ench) && !hasConflicts(ench,item)){
                             item.addUnsafeEnchantment(ench, 1);
                             if(!inventory.getName().contains("Admin")) {
                                 changePlayerExp(p, -1 * getExpAtLevel(60));
@@ -380,9 +377,40 @@ public class EnchantingGui implements Listener {
                 }
             }
             ItemStack goBack = new ItemStack(Material.ENCHANTMENT_TABLE);
-            setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back");
+            setItemName(goBack, ChatColor.DARK_RED + "" + ChatColor.BOLD + "Go Back to Vanilla Enchants");
             addLoreToItem(goBack, ChatColor.GREEN + "" + ChatColor.ITALIC + "Current Experience: " + getPlayerExp(p));
             inventory.setItem(31, goBack);
         }
+    }
+    private static boolean hasConflicts(Enchantment ench, ItemStack item){
+        if(ench.equals(Enchantment.SILK_TOUCH)){
+            return item.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
+        } else if(ench.equals(Enchantment.LOOT_BONUS_BLOCKS)){
+            return item.containsEnchantment(Enchantment.SILK_TOUCH);
+        } else if(ench.equals(Enchantment.DAMAGE_ALL)){
+            return (item.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS) || item.containsEnchantment(Enchantment.DAMAGE_UNDEAD));
+        } else if(ench.equals(Enchantment.DAMAGE_UNDEAD)){
+            return (item.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS) || item.containsEnchantment(Enchantment.DAMAGE_ALL));
+        } else if(ench.equals(Enchantment.DAMAGE_ARTHROPODS)){
+            return (item.containsEnchantment(Enchantment.DAMAGE_ALL) || item.containsEnchantment(Enchantment.DAMAGE_UNDEAD));
+        } else if(ench.equals(Enchantment.DAMAGE_UNDEAD)){
+            return (item.containsEnchantment(Enchantment.DAMAGE_ALL) || item.containsEnchantment(Enchantment.DAMAGE_UNDEAD));
+        } else if(ench.equals(Enchantment.PROTECTION_EXPLOSIONS)){
+            return (item.containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL) || item.containsEnchantment(Enchantment.PROTECTION_FALL)
+                || item.containsEnchantment(Enchantment.PROTECTION_FIRE) || item.containsEnchantment(Enchantment.PROTECTION_PROJECTILE));
+        } else if(ench.equals(Enchantment.PROTECTION_FALL)){
+            return (item.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS) || item.containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL)
+                    || item.containsEnchantment(Enchantment.PROTECTION_FIRE) || item.containsEnchantment(Enchantment.PROTECTION_PROJECTILE));
+        } else if(ench.equals(Enchantment.PROTECTION_FIRE)){
+            return (item.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS) || item.containsEnchantment(Enchantment.PROTECTION_FALL)
+                    || item.containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL) || item.containsEnchantment(Enchantment.PROTECTION_PROJECTILE));
+        } else if(ench.equals(Enchantment.PROTECTION_PROJECTILE)){
+            return (item.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS) || item.containsEnchantment(Enchantment.PROTECTION_FALL)
+                    || item.containsEnchantment(Enchantment.PROTECTION_FIRE) || item.containsEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL));
+        } else if(ench.equals(Enchantment.PROTECTION_ENVIRONMENTAL)) {
+            return (item.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS) || item.containsEnchantment(Enchantment.PROTECTION_FALL)
+                    || item.containsEnchantment(Enchantment.PROTECTION_FIRE) || item.containsEnchantment(Enchantment.PROTECTION_PROJECTILE));
+        }
+        return false;
     }
 }
