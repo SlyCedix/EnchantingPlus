@@ -92,8 +92,9 @@ public class EnchantingGui implements Listener {
                 populateCustomEnchants(inventory, p);
             } else if(clickedName.contains("Vanilla")) {
                 populateVanillaEnchants(inventory, p);
-            } else {
+            } else if(inventory.getItem(31).getItemMeta().getDisplayName().contains("Eplus")) {
                 getEnchantFromName(clickedName, p, inventory);
+            } else if(inventory.getItem(31).getItemMeta().getDisplayName().contains("Vanilla")){
                 getVanillaEnchantFromName(clickedName, p, inventory);
             }
         }
